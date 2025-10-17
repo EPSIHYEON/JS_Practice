@@ -1,0 +1,11 @@
+# Git이 텍스트 파일과 바이너리 파일을 자동으로 구분하도록 설정
+* text=auto
+
+# 쉘 스크립트(.sh)와 같은 파일은 강제로 LF를 사용 (Linux/macOS 환경 통일)
+*.sh text eol=lf
+*.bash text eol=lf
+
+# 설정 파일 등은 텍스트로 취급
+*.json text
+*.yml text
+*.yaml text
