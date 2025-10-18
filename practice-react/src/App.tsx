@@ -1,27 +1,29 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import {BrowserRouter , Routes, Route, Link} from 'react-router-dom';
+import Home from './pages/Home'
+
 import './App.css'
-import TodoBoard from "./components/TodoBoard"
+import About from './pages/About';
+import Profile from './pages/Profile';
+
 
 function App() {
-  //const [count, setCount] = useState(0)
-    const [inputValue, setInputValue] = useState('')
-    const [todoList,setTodoList] = useState<string[]>([])
-    const addItem = () => {
-      if (inputValue.trim() === "") return;
-      console.log("Im hererere", inputValue)
-      setTodoList([...todoList, inputValue])
-    }
+
   return (
-    <>
-    <main>
-      <TodoBoard todoList={todoList}></TodoBoard>
-      <input value ={inputValue} type="text" onChange={(event)=>setInputValue(event.target.value)}></input>
-      <button onClick={addItem}>추가</button>
-      
-    </main>
-    </>
+    <BrowserRouter>
+    <nav>
+      <Link to={'/'}>Home   </Link>
+      <Link to={'/about'}>About   </Link>
+      <Link to={'/profile'}>Profile   </Link>
+    </nav>
+    <Routes>
+      <Route path='/' element={<Home />} />
+      <Route path='/about' element={<About />} />
+      <Route path='/profile' element={<Profile/>} />
+
+        </Routes>
+        <footer>footer입니다</footer>
+        </BrowserRouter>
+  
   )
 }
 
