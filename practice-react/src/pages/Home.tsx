@@ -37,7 +37,7 @@ export default function Home(){
         </h1>
         <Link 
           to= {"/newpage"}
-          className="bg-cyan-500 text-white px-5 py-2 rounded-lg shadow-md hover:bg-cyan-600 transition-colors mt-5 ml-160 text-[20px]"
+          className="bg-cyan-500 text-white px-5 py-2 rounded-lg shadow-md hover:bg-cyan-600 transition-colors mt-5 ml-160 text-xl"
         >
           새 글 추가
         </Link>

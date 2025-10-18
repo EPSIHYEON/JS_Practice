@@ -61,9 +61,9 @@ export default function MyPage(){
           {/* 테이블 헤더 */}
           <thead className="bg-gray-50 border-b border-gray-200 ">
             <tr>
-              <th className="p-4 text-center text-[26px]  text-gray-500 w-1/6">번호</th>
-              <th className="p-4 text-left text-[26px]  text-gray-500 w-4/6">제목</th>
-              <th className="p-4 text-center text-[26px]  text-gray-500 w-1/6">조회수</th>
+              <th className="p-4 text-center text-xl  text-gray-500 w-1/6">번호</th>
+              <th className="p-4 text-left text-xl  text-gray-500 w-4/6">제목</th>
+              <th className="p-4 text-center text-xl  text-gray-500 w-1/6">조회수</th>
             </tr>
           </thead>
           
