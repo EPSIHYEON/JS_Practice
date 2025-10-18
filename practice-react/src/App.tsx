@@ -1,7 +1,6 @@
 import {BrowserRouter , Routes, Route, Link} from 'react-router-dom';
 import Home from './pages/Home'
-
-import './App.css'
+import MyPage from './pages/MyPage'
 import NewPage from './pages/NewPage';
 
 
@@ -9,19 +8,35 @@ function App() {
 
   return (
     <BrowserRouter>
-    <nav>
-      <Link to={'/'}>Home   </Link>
-      <Link to={'/newpage'}>NewPage   </Link>
+    <div className="min-h-screen bg-sky-200">
+    <nav className="flex items-center p-5">
+  {/* 왼쪽 로고 */}
+  <Link to={'/'} className='text-3xl font-bold'>GURUM</Link>
 
-    </nav>
+  {/* 오른쪽 메뉴 */}
+  <div className="flex items-center gap-4 ml-auto text-[20px]">
+    <Link to={'/newpage'}>새글 추가</Link>
+    <Link to="/mypage" className="text-gray-700">
+      마이페이지
+    </Link>
+    {/* 프로필 아이콘 */}
+    <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+      <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+      </svg>
+    </div>
+  </div>
+</nav>
+
     <Routes>
       <Route path='/' element={<Home />} />
       <Route path='/newpage' element={<NewPage />} />
+      <Route path='/mypage' element={<MyPage />}/>
 
         </Routes>
-        <footer>footer입니다</footer>
+     </div>
         </BrowserRouter>
-  
+
   )
 }
 
