@@ -9,3 +9,5 @@ export class PostsDto {
   @IsNotEmpty()
   content: string;
 }
+
+export class UpdatePostDto extends PostsDto {}
