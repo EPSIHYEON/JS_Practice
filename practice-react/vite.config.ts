@@ -5,13 +5,13 @@ import { fileURLToPath } from 'url'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  server:{
-    port: 3000
+  server: {
+    port: 5137
   },
-  resolve:{
+  resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
-      '@assests': fileURLToPath(new URL('./src/assets', import.meta.url))
+      '@assets': fileURLToPath(new URL('./src/assets', import.meta.url))
     }
   }
 })

@@ -1,25 +1,38 @@
 import React, { useState } from 'react';
+import {useNavigate} from 'react-router-dom';
+import {createPost} from '../api/posts';
+
 // useNavigate는 API 연동할 때 다시 쓸 거라 일단 주석 처리
 // import { useNavigate } from 'react-router-dom';
 
 function NewPage(){
-  // 1. input과 textarea의 값을 저장하기 위한 state
+  // 제목 입력값 관리
   const [title, setTitle] = useState('');
+  // 본문 입력값 관리
   const [content, setContent] = useState('');
+  // 서버 에러 메시지 표시용
+  const [error, setError] = useState<string | null>(null);
+  // 저장 성공 시 목록 화면으로 이동
+  const navigate = useNavigate();
   
-  // const navigate = useNavigate(); // 페이지 이동 hook
 
-  // 2. '새 글 추가' 버튼 눌렀을 때 실행될 함수
-  const handleSubmit = (e: React.FormEvent) => {
-    // 폼(form)의 기본 동작(새로고침)을 막음
-    e.preventDefault(); 
-    
-    // API 로직은 뺐어!
-    // 나중에 여기에 API(fetch/axios) 전송 코드가 들어감
-    console.log('전송할 데이터:', { title, content });
-    
-    // (나중에) 전송 성공 시 메인 페이지로 이동
-    // navigate('/');
+  // 폼 제출 시 새 글 생성 API 호출
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); // 기본 새로고침 막기
+    if (!title.trim() || !content.trim()) {
+      setError('제목과 내용을 모두 입력해주세요.');
+      return;
+    }
+
+   
+    setError(null);
+    try {
+      await createPost({ title, content }); // Nest POST /posts 호출
+      navigate('/'); // 목록으로 이동
+    } catch (err) {
+      console.error(err);
+      setError('게시글 저장에 실패했습니다. 다시 시도해주세요.');
+    }
   };
 
   return (
@@ -34,12 +47,21 @@ function NewPage(){
 
       {/* 2. 폼 (handleSubmit 함수 연결) */}
       <form onSubmit={handleSubmit}>
+
+         {error && (
+          <p className="text-red-500 mb-4" role="alert">
+          {error}
+        </p>
+  )}
         
         {/* 3. 제목 입력창 */}
         <input
           type="text"
           value={title} // state와 연결
-          onChange={(e) => setTitle(e.target.value)} // 타이핑할 때마다 state 변경
+          onChange={(e) => {setTitle(e.target.value);
+                            if (error) setError(null);
+          }} // 타이핑할 때마다 state 변경
+          
           
           
           // ★ 요청한 기능: 'placeholder'를 쓰면 됨
@@ -54,7 +76,7 @@ function NewPage(){
         {/* 4. 내용 입력창 (textarea) */}
         <textarea
           value={content} // state와 연결
-          onChange={(e) => setContent(e.target.value)} // 타이핑할 때마다 state 변경
+          onChange={(e) => {setContent(e.target.value); if (error) setError(null);} }// 타이핑할 때마다 state 변경
           
           // ★ 요청한 기능: 'placeholder'
           placeholder="내용을 입력하세요" 

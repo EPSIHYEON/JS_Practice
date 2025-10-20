@@ -1,16 +1,25 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 // BlogCard 컴포넌트를 import (경로는 맞게 수정해줘)
 import BoardCard from '../components/BoardCards';
 import type { PostImageType } from '../components/BoardCards';
+import { fetchPosts } from '../api/posts';
 
 // Post 데이터 타입 (나중에 DB에서 받아올 구조)
 interface Post {
-  id: number;
+  id: number | string;
   title: string;
   snippet: string;
   type: PostImageType;
   imageUrl?: string; // 'image' 타입일 때만 사용
+}
+
+
+// 백엔드 응답 타입 최소 정의
+interface BackendPost {
+  _id: string;
+  title: string;
+  content: string;
 }
 
 // export default로 Home 컴포넌트를 내보냄
@@ -18,14 +27,50 @@ export default function Home(){
   
   // 샘플 데이터
   // 나중에는 이 데이터를 useState와 useEffect로 DB에서 불러올 거야.
-  const posts: Post[] = [
-    { id: 1, title: "하루를 보람차게 보내는 방법", snippet: "오늘은 열심히 사는 방법에 대해 이야기 해보겠다 하루를 보람차게 보내는 방법은 일단 첫번째...", type: 'noImage' }, // URL 예시
-    { id: 2, title: "하루를 열심히 보내는 방법", snippet: "오늘은 열심히 사는 방법에 대해 이야기 해보겠다 하루를 보람차게 보내는 방법은 일단 첫번째...", type: 'noImage' },
-    { id: 3, title: "하루를 멋지게 보내는 방법", snippet: "오늘은 열심히 사는 방법에 대해 이야기 해보겠다 하루를 보람차게 보내는 방법은 일단 첫번째...", type: 'noImage' },
-    { id: 4, title: "하루를 보람차게 보내는 방법", snippet: "오늘은 열심히 사는 방법에 대해 이야기 해보겠다 하루를 보람차게 보내는 방법은 일단 첫번째...", type: 'noImage' },
-    { id: 5, title: "GITHUB 관리하는 방법", snippet: "Git과 Github의 차이점부터 브랜치 전략까지...", type: 'noImage' },
-    { id: 6, title: "리액트 열심히 하는 방법", snippet: "컴포넌트 라이프사이클과 상태 관리에 대해 알아봅니다...", type: 'noImage' },
+  const fallbackPosts: Post[] = [
+    
   ];
+
+  const [posts, setPosts] = useState<Post[]>(fallbackPosts);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    fetchPosts()
+      .then((docs: BackendPost[]) => {
+        if (!isMounted) return;
+
+        const mapped: Post[] = docs.map((doc, index) => ({
+          id: doc._id ?? `post-${index}`,
+          title: doc.title ?? '제목 없음',
+          snippet:
+            doc.content && doc.content.length > 120
+              ? doc.content.slice(0, 120)
+              : doc.content ?? '내용이 없습니다',
+          type: 'noImage',
+        }));
+
+        if (mapped.length) setPosts(mapped);
+      })
+      .catch((err) => {
+        if (!isMounted) return;
+        console.error(err);
+        setError(err as Error);
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  if (loading) return <div>불러오는 중…</div>;
+  if (error) return <div>게시글을 불러오지 못했습니다.</div>;
+
 
   // return 되는 이 JSX가 App.tsx의 <main> 안으로 들어가게 됨
   return (
