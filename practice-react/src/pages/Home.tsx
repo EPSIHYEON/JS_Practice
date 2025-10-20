@@ -82,7 +82,7 @@ export default function Home(){
         </h1>
         <Link 
           to= {"/newpage"}
-          className="bg-cyan-500 text-white px-5 py-2 rounded-lg shadow-md hover:bg-cyan-600 transition-colors mt-5 ml-160 text-xl"
+          className="bg-sky-500 text-white px-5 py-2 rounded-lg shadow-md hover:bg-sky-600 transition-colors mt-5 ml-160 text-xl"
         >
           새 글 추가
         </Link>
@@ -99,6 +99,7 @@ export default function Home(){
         {posts.map(post => (
           <BoardCard
             key={post.id}
+            id={String(post.id)}
             title={post.title}
             snippet={post.snippet}
             type={post.type}

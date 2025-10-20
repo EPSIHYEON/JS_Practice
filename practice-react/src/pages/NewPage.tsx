@@ -28,6 +28,7 @@ function NewPage(){
     setError(null);
     try {
       await createPost({ title, content }); // Nest POST /posts 호출
+      alert('글이 올라갔습니다')
       navigate('/'); // 목록으로 이동
     } catch (err) {
       console.error(err);
@@ -93,8 +94,8 @@ function NewPage(){
         <div className="flex justify-end">
           <button
             type="submit" // 이 버튼을 누르면 <form>의 onSubmit이 실행됨
-            className="bg-cyan-500 text-white px-6 py-2 rounded-lg 
-                       font-semibold shadow-md hover:bg-cyan-600 transition-colors"
+            className="bg-sky-500 text-white px-6 py-2 rounded-lg 
+                        shadow-md hover:bg-sky-600 transition-colors"
           >
             새 글 추가
           </button>
