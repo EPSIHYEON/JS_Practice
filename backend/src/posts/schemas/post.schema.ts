@@ -12,4 +12,3 @@ export class Post {
 
 export type PostDocument = Post & Document;
 export const PostSchema = SchemaFactory.createForClass(Post);
-users;
