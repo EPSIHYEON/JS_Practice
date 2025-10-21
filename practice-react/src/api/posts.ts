@@ -1,15 +1,34 @@
 import { useMemo } from 'react';
 import { useApi } from './client';
 
+export interface PostAuthor {
+  _id: string;
+  username: string;
+}
+
 export interface PostResponse {
   _id: string;
   title: string;
   content: string;
+  imageData?: string;
+  author?: PostAuthor;
+  likesCount: number;
+  liked?: boolean;
 }
 
 export interface PostPayload {
   title: string;
   content: string;
+  imageData?: string | null;
+}
+
+export interface ToggleLikeResponse extends PostResponse {
+  liked: boolean;
+}
+
+export interface LikeSummaryResponse {
+  totalLikes: number;
+  postCount: number;
 }
 
 export function usePostsApi() {
@@ -33,6 +52,13 @@ export function usePostsApi() {
         request<{ success: boolean }>(`/posts/${id}`, {
           method: 'DELETE',
         }),
+      toggleLike: (id: string) =>
+        request<ToggleLikeResponse>(`/posts/${id}/like`, {
+          method: 'POST',
+        }),
+      fetchLikeSummary: () =>
+        request<LikeSummaryResponse>('/posts/me/likes-summary'),
+      fetchMyPosts: () => request<PostResponse[]>('/posts/me'),
     }),
     [request],
   );

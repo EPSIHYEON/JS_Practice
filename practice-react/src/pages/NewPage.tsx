@@ -10,11 +10,38 @@ function NewPage(){
   const [title, setTitle] = useState('');
   // 본문 입력값 관리
   const [content, setContent] = useState('');
+  const [imageData, setImageData] = useState<string | null>(null);
+  const [imageName, setImageName] = useState<string | null>(null);
   // 서버 에러 메시지 표시용
   const [error, setError] = useState<string | null>(null);
   // 저장 성공 시 목록 화면으로 이동
   const navigate = useNavigate();
   const { createPost } = usePostsApi();
+
+  const handleImageChange = async (file: File | null) => {
+    if (!file) {
+      setImageData(null);
+      setImageName(null);
+      return;
+    }
+    try {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        setImageData(typeof reader.result === 'string' ? reader.result : null);
+        setImageName(file.name);
+      };
+      reader.onerror = () => {
+        console.error(reader.error);
+        setImageData(null);
+        setImageName(null);
+      };
+    } catch (err) {
+      console.error(err);
+      setImageData(null);
+      setImageName(null);
+    }
+  };
 
   // 폼 제출 시 새 글 생성 API 호출
   const handleSubmit = async (e: React.FormEvent) => {
@@ -27,7 +54,7 @@ function NewPage(){
    
     setError(null);
     try {
-      await createPost({ title, content }); // Nest POST /posts 호출
+      await createPost({ title, content, imageData: imageData ?? undefined }); // Nest POST /posts 호출
       alert('글이 올라갔습니다')
       navigate('/home'); // 목록으로 이동
     } catch (err) {
@@ -73,6 +100,52 @@ function NewPage(){
                      placeholder:text-gray-500 mb-6 text-2xl text-black
                      bg-white"
         />
+
+        
+        {/* 4-1. 이미지 업로드 */}
+        <div className="mb-6">
+          <input
+            id="new-post-image"
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => handleImageChange(e.target.files?.[0] ?? null)}
+          />
+          <div className="flex justify-end items-center gap-3">
+            {imageData ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setImageData(null);
+                  setImageName(null);
+                }}
+                className="inline-flex items-center px-4 py-2 bg-red-500 text-white text-sm font-medium rounded-md hover:bg-red-600 transition-colors"
+              >
+                이미지 제거
+              </button>
+            ) : (
+              <label
+                htmlFor="new-post-image"
+                className="inline-flex items-center px-4 py-2 bg-sky-400 text-white text-sm font-medium rounded-md cursor-pointer hover:bg-sky-500 transition-colors"
+              >
+                이미지 선택
+              </label>
+            )}
+            <span className="text-sm text-gray-500">
+              {imageName ?? '선택한 파일 없음'}
+            </span>
+          </div>
+          {imageData && (
+            <div className="mt-4">
+              <img
+                src={imageData}
+                alt="선택한 이미지 미리보기"
+                className="max-h-64 rounded-lg shadow-md"
+              />
+            </div>
+          )}
+        </div>
+
 
         {/* 4. 내용 입력창 (textarea) */}
         <textarea

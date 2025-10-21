@@ -1,15 +1,27 @@
 import { useAuth } from '../contexts/AuthContext';
 import { login } from '../api/auth';
-import { useNavigate } from 'react-router-dom';
-import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function LoginPage() {
 const navigate = useNavigate();
+const location = useLocation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 const [error, setError] = useState<string | null>(null);
 const { setToken } = useAuth();
+const pendingRedirect =
+  (location.state as { from?: string } | undefined)?.from;
+const redirectTo =
+  pendingRedirect && pendingRedirect.startsWith('/') ? pendingRedirect : '/home';
+
+ useEffect(() => {
+  const message = (location.state as { message?: string } | undefined)?.message;
+  if (message) {
+    setError(message);
+  }
+ }, [location.state]);
  const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
       if (!username.trim() || !password.trim()) {
@@ -20,7 +32,7 @@ const { setToken } = useAuth();
   try {
     const { accessToken } = await login({ username, password });
     setToken(accessToken);
-    navigate('/home');
+    navigate(redirectTo, { replace: true });
   } catch (err) {
      console.error(err);
     setError('로그인에 실패했습니다.');

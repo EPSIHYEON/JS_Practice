@@ -1,7 +1,7 @@
-import React from 'react';
-// 1. MyCard 컴포넌트를 import
+import React, { useEffect, useState } from 'react';
 import MyCard from '../components/MyCard';
-import type { MyCardProps } from '../components/MyCard';
+import { usePostsApi, type PostResponse } from '../api/posts';
+import { useAuth } from '../contexts/AuthContext';
 
 // 상단 통계 카드 컴포넌트 (MyPage 내부에서만 사용)
 function StatCard({ value, label }: { value: number | string; label: string }) {
@@ -19,15 +19,38 @@ function StatCard({ value, label }: { value: number | string; label: string }) {
 
 // 메인 마이페이지 컴포넌트
 export default function MyPage(){
+  const { user } = useAuth();
+  const { fetchLikeSummary, fetchMyPosts } = usePostsApi();
+  const [totalLikes, setTotalLikes] = useState(0);
+  const [postCount, setPostCount] = useState(0);
+  const [myPosts, setMyPosts] = useState<PostResponse[]>([]);
 
-  // 2. 요청한 '쓰레기 데이터들' (더미 데이터)
-  // (MyCardProps 인터페이스를 따르는 배열)
-  const myPosts: MyCardProps[] = [
-    { id: 101, index: 1, title: "열심히 사는 법", views: 30 },
-    { id: 102, index: 2, title: "GITHUB 레포 설정하는 방법", views: 27 },
-    { id: 103, index: 3, title: "리액트 왕초보 탈출", views: 15 },
-    // 필요하면 여기에 데이터 더 추가...
-  ];
+  useEffect(() => {
+    if (!user) return;
+    fetchLikeSummary()
+      .then(({ totalLikes: likes, postCount: count }) => {
+        setTotalLikes(likes);
+        setPostCount(count);
+      })
+      .catch((err) => {
+        console.error('좋아요 요약 정보를 불러오지 못했습니다:', err);
+      });
+  }, [fetchLikeSummary, user]);
+
+  useEffect(() => {
+    if (!user) {
+      setMyPosts([]);
+      return;
+    }
+    fetchMyPosts()
+      .then((posts) => {
+        setMyPosts(posts);
+      })
+      .catch((err) => {
+        console.error('내 게시글을 불러오지 못했습니다:', err);
+        setMyPosts([]);
+      });
+  }, [fetchMyPosts, user]);
 
   return (
     // 페이지 전체 컨테이너 (배경색은 App.tsx가 담당)
@@ -45,9 +68,8 @@ export default function MyPage(){
           </div>
           
           {/* 통계 카드들 */}
-          <StatCard value={29} label="나의 글" />
-          <StatCard value={72} label="총 조회수" />
-          <StatCard value={48} label="총 좋아요 수" />
+          <StatCard value={postCount} label="나의 글" />
+          <StatCard value={totalLikes} label="총 좋아요 수" />
         </div>
       </div>
 
@@ -63,21 +85,31 @@ export default function MyPage(){
             <tr>
               <th className="p-4 text-center text-xl  text-gray-500 w-1/6">번호</th>
               <th className="p-4 text-left text-xl  text-gray-500 w-4/6">제목</th>
-              <th className="p-4 text-center text-xl  text-gray-500 w-1/6">조회수</th>
+
             </tr>
           </thead>
           
           {/* 테이블 바디 (MyCard 컴포넌트 사용) */}
           <tbody>
-            {myPosts.map(post => (
-              <MyCard 
-                key={post.id}
-                id={post.id}
-                index={post.index}
-                title={post.title}
-                views={post.views}
-              />
-            ))}
+            {myPosts.length === 0 ? (
+              <tr>
+                <td
+                  className="p-6 text-center text-gray-500"
+                  colSpan={2}
+                >
+                  작성한 글이 없습니다.
+                </td>
+              </tr>
+            ) : (
+              myPosts.map((post, index) => (
+                <MyCard
+                  key={post._id}
+                  id={post._id}
+                  index={index + 1}
+                  title={post.title ?? '(제목 없음)'}
+                />
+              ))
+            )}
           </tbody>
         </table>
       </div>

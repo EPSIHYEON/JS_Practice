@@ -1,28 +1,54 @@
 import React, { createContext, useContext, useState, useMemo } from 'react';
 
+type AuthUser = {
+  id: string;
+  username: string;
+};
+
 type AuthContextValue = {
   token: string | null;
+  user: AuthUser | null;
   setToken: (token: string | null) => void;
   isAuthenticated: boolean;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
+const decodeToken = (token: string): AuthUser | null => {
+  try {
+    const base64 = token.split('.')[1];
+    if (!base64) return null;
+    if (typeof window === 'undefined' || typeof window.atob !== 'function') {
+      return null;
+    }
+    const decoded = window.atob(base64);
+    const payload = JSON.parse(decoded) as {
+      sub?: string;
+      username?: string;
+    };
+    if (!payload?.sub || !payload?.username) return null;
+    return { id: String(payload.sub), username: String(payload.username) };
+  } catch {
+    return null;
+  }
+};
 
-  const value = useMemo(
-    () => ({
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [token, setTokenState] = useState<string | null>(() => localStorage.getItem('token'));
+
+  const value = useMemo(() => {
+    const user = token ? decodeToken(token) : null;
+    return {
       token,
       setToken: (newToken: string | null) => {
         if (newToken) localStorage.setItem('token', newToken);
         else localStorage.removeItem('token');
-        setToken(newToken);
+        setTokenState(newToken);
       },
-      isAuthenticated: Boolean(token),
-    }),
-    [token],
-  );
+      user,
+      isAuthenticated: Boolean(user),
+    };
+  }, [token]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

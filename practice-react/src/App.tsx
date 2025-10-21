@@ -1,5 +1,6 @@
-import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
+import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
+import type { ReactNode } from 'react';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Home from './pages/Home';
 import MyPage from './pages/MyPage';
 import NewPage from './pages/NewPage';
@@ -53,15 +54,53 @@ function AppLayout() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/home" element={<Home />} />
-        <Route path="/newpage" element={<NewPage />} />
-        <Route path="/mypage" element={<MyPage />} />
+        <Route
+          path="/newpage"
+          element={
+            <RequireAuth>
+              <NewPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/mypage"
+          element={
+            <RequireAuth>
+              <MyPage />
+            </RequireAuth>
+          }
+        />
         <Route path="/writtenpage/:id" element={<WrittenPage />} />
-        <Route path="/updatepage/:id" element={<UpdatePage />} />
+        <Route
+          path="/updatepage/:id"
+          element={
+            <RequireAuth>
+              <UpdatePage />
+            </RequireAuth>
+          }
+        />
         <Route path="/loginpage" element={<LoginPage />} />
         <Route path="/signuppage" element={<SignupPage />} />
       </Routes>
     </div>
   );
+}
+
+function RequireAuth({ children }: { children: ReactNode }) {
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+
+  if (!isAuthenticated) {
+    return (
+      <Navigate
+        to="/loginpage"
+        replace
+        state={{ from: location.pathname, message: '로그인이 필요합니다.' }}
+      />
+    );
+  }
+
+  return <>{children}</>;
 }
 
 export default App

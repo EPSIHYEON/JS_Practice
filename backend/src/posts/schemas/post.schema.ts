@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class Post {
@@ -8,6 +8,15 @@ export class Post {
 
   @Prop({ required: true })
   content: string;
+
+  @Prop()
+  imageData?: string;
+
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  author: Types.ObjectId;
+
+  @Prop({ type: [Types.ObjectId], ref: 'User', default: [] })
+  likedBy: Types.ObjectId[];
 }
 
 export type PostDocument = Post & Document;
