@@ -1,8 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { UserDocument } from '../users/schemas/user.schema';
 import { UsersService } from '../users/users.service';
-import { access } from 'fs';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 
 @Injectable()
@@ -28,11 +28,14 @@ export class AuthService {
     return user;
   }
 
-  async login(user: any) {
-    const payload = { sub: user._id.toString(), username: user.username };
-    return {
-      accessToken: this.jwtService.sign(payload),
+  async login(user: UserDocument) {
+    const payload: { sub: string; username: string } = {
+      sub: user._id.toString(), // string으로 보장되는 getter
+      username: user.username, // 스키마에 username 필드가 정의돼 있어야 함
     };
+
+    const accessToken = await this.jwtService.signAsync(payload);
+    return { accessToken };
   }
 
   async signup(createUserDto: CreateUserDto) {

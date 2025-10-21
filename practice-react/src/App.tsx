@@ -20,13 +20,13 @@ function App() {
 
 function AppLayout() {
   const location = useLocation();
-  const hideLayout = ['/loginpage', '/signuppage'].includes(location.pathname);
+  const hideLayout = ['/', '/loginpage', '/signuppage'].includes(location.pathname);
   return (
     <div className={hideLayout ? '' : 'min-h-screen bg-sky-200'}>
       {!hideLayout && (
         <nav className="flex items-center p-5">
           {/* 왼쪽 로고 */}
-          <Link to="/" className="text-3xl font-bold">
+          <Link to="/home" className="text-3xl font-bold">
             GURUM
           </Link>
 
@@ -51,7 +51,8 @@ function AppLayout() {
       )}
 
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/newpage" element={<NewPage />} />
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/writtenpage/:id" element={<WrittenPage />} />

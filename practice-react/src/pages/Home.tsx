@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 // BlogCard 컴포넌트를 import (경로는 맞게 수정해줘)
 import BoardCard from '../components/BoardCards';
 import type { PostImageType } from '../components/BoardCards';
-import { fetchPosts } from '../api/posts';
+import { usePostsApi } from '../api/posts';
 
 // Post 데이터 타입 (나중에 DB에서 받아올 구조)
 interface Post {
@@ -34,6 +34,7 @@ export default function Home(){
   const [posts, setPosts] = useState<Post[]>(fallbackPosts);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const { fetchPosts } = usePostsApi();
 
   useEffect(() => {
     let isMounted = true;
@@ -66,7 +67,7 @@ export default function Home(){
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [fetchPosts]);
 
   if (loading) return <div>불러오는 중…</div>;
   if (error) return <div>게시글을 불러오지 못했습니다.</div>;

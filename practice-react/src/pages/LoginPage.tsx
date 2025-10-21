@@ -20,7 +20,7 @@ const { setToken } = useAuth();
   try {
     const { accessToken } = await login({ username, password });
     setToken(accessToken);
-    navigate('/');
+    navigate('/home');
   } catch (err) {
      console.error(err);
     setError('로그인에 실패했습니다.');

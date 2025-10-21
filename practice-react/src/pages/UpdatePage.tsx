@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { fetchPost, updatePost } from '../api/posts'; 
+import { usePostsApi } from '../api/posts'; 
 
 
 
@@ -11,6 +11,7 @@ export default function UpdatePage(){
     const [content, setContent ] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [ submitting, setSubmitting] = useState(false);
+    const { fetchPost, updatePost } = usePostsApi();
 
     useEffect(() => {
     if (!id) {
@@ -31,7 +32,7 @@ export default function UpdatePage(){
  };
 
  loadPost();
-}, [id]);
+}, [fetchPost, id]);
 
 const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

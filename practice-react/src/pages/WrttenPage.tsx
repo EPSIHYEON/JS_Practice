@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { fetchPost , removePost } from '../api/posts';
+import { usePostsApi } from '../api/posts';
 
 
 export default function WrttenPage() {
@@ -10,6 +10,7 @@ export default function WrttenPage() {
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { fetchPost, removePost } = usePostsApi();
 
   
   useEffect(() => {
@@ -32,7 +33,7 @@ export default function WrttenPage() {
       }
     };
     load();
-  }, [id]);
+  }, [fetchPost, id]);
 
   const handleDelete = async () => {
   if (!id) return;
@@ -41,7 +42,7 @@ export default function WrttenPage() {
   try {
     await removePost(id);
     alert('삭제되었습니다.');
-    navigate('/');
+    navigate('/home');
   } catch (err) {
     console.error(err);
     alert('삭제에 실패했습니다. 다시 시도해주세요.');

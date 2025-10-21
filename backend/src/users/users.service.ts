@@ -13,14 +13,21 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const exists = await this.userModel.exists({ email: createUserDto.email });
-    if (exists) throw new ConflictException('이미 등록된 이메일입니다.');
+    const email_exists = await this.userModel.exists({
+      email: createUserDto.email,
+    });
+    const username_exists = await this.userModel.exists({
+      username: createUserDto.username,
+    });
+    if (email_exists) throw new ConflictException('이미 등록된 이메일입니다.');
+    if (username_exists)
+      throw new ConflictException('이미 등록된 아이디입니다.');
 
     const passwordHash = await bcrypt.hash(createUserDto.password, 10);
     return this.userModel.create({
       email: createUserDto.email,
       passwordHash,
-      nickname: createUserDto.nickname,
+      username: createUserDto.username,
     });
   }
 

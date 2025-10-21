@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {useNavigate} from 'react-router-dom';
-import {createPost} from '../api/posts';
+import { usePostsApi } from '../api/posts';
 
 // useNavigate는 API 연동할 때 다시 쓸 거라 일단 주석 처리
 // import { useNavigate } from 'react-router-dom';
@@ -14,7 +14,7 @@ function NewPage(){
   const [error, setError] = useState<string | null>(null);
   // 저장 성공 시 목록 화면으로 이동
   const navigate = useNavigate();
-  
+  const { createPost } = usePostsApi();
 
   // 폼 제출 시 새 글 생성 API 호출
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,7 +29,7 @@ function NewPage(){
     try {
       await createPost({ title, content }); // Nest POST /posts 호출
       alert('글이 올라갔습니다')
-      navigate('/'); // 목록으로 이동
+      navigate('/home'); // 목록으로 이동
     } catch (err) {
       console.error(err);
       setError('게시글 저장에 실패했습니다. 다시 시도해주세요.');
